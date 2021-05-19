@@ -53,7 +53,14 @@ class LocaleMiddleware(MiddlewareMixin):
                     '%s%s/' % (script_prefix, language),
                     1
                 )
-                return self.response_redirect_class(language_url)
+                # Redirect to a language-specific URL. Which URL this is
+                # depends on the language detected by
+                # get_language_from_request() which may depend on the language
+                # choice cookie or the Accept-Language header. HTTP Caches may
+                # cache the redirect, so we need a Vary header.
+                redirect = self.response_redirect_class(language_url)
+                patch_vary_headers(redirect, ('Accept-Language','Cookie'))
+                return redirect
 
         if not (i18n_patterns_used and language_from_path):
             patch_vary_headers(response, ('Accept-Language',))
