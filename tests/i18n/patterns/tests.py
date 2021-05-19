@@ -256,7 +256,7 @@ class URLVaryAcceptLanguageTests(URLTestCaseBase):
     def test_en_redirect(self):
         response = self.client.get('/account/register/', HTTP_ACCEPT_LANGUAGE='en')
         self.assertRedirects(response, '/en/account/register/')
-        self.assertFalse(response.get('Vary'))
+        self.assertEqual(response.get('Vary'), 'Accept-Language, Cookie')
 
         response = self.client.get(response['location'])
         self.assertEqual(response.status_code, 200)
