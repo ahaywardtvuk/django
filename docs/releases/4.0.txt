@@ -85,6 +85,9 @@ Minor features
 * The new :attr:`.ModelAdmin.search_help_text` attribute allows specifying a
   descriptive text for the search box.
 
+* The :attr:`.InlineModelAdmin.verbose_name_plural` attribute now fallbacks to
+  the :attr:`.InlineModelAdmin.verbose_name` + ``'s'``.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -187,7 +190,13 @@ Minor features
 Cache
 ~~~~~
 
-* ...
+* The new async API for ``django.core.cache.backends.base.BaseCache`` begins
+  the process of making cache backends async-compatible. The new async methods
+  all have ``a`` prefixed names, e.g. ``aadd()``, ``aget()``, ``aset()``,
+  ``aget_or_set()``, or ``adelete_many()``.
+
+  Going forward, the ``a`` prefix will be used for async variants of methods
+  generally.
 
 CSRF
 ~~~~
@@ -278,6 +287,9 @@ Management Commands
   <django.core.management.BaseCommand.suppressed_base_arguments>` attribute
   allows suppressing unsupported default command options in the help output.
 
+* The new :option:`startapp --exclude` and :option:`startproject --exclude`
+  options allow excluding directories from the template.
+
 Migrations
 ~~~~~~~~~~
 
@@ -346,7 +358,8 @@ Signals
 Templates
 ~~~~~~~~~
 
-* ...
+* :tfilter:`floatformat` template filter now allows using the ``u`` suffix to
+  force disabling localization.
 
 Tests
 ~~~~~
@@ -564,6 +577,10 @@ Miscellaneous
   need the previous behavior, :ref:`override the widget template
   <overriding-built-in-widget-templates>` with the appropriate template from
   Django 3.2.
+
+* The :tfilter:`floatformat` template filter no longer depends on the
+  :setting:`USE_L10N` setting and always returns localized output. Use the
+  ``u`` suffix to disable localization.
 
 .. _deprecated-features-4.0:
 

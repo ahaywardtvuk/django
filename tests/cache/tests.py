@@ -213,7 +213,7 @@ class DummyCacheTests(SimpleTestCase):
     def test_delete_many_invalid_key(self):
         msg = KEY_ERRORS_WITH_MEMCACHED_MSG % ':1:key with spaces'
         with self.assertWarnsMessage(CacheKeyWarning, msg):
-            cache.delete_many({'key with spaces': 'foo'})
+            cache.delete_many(['key with spaces'])
 
     def test_clear(self):
         "clear does nothing for the dummy cache backend"
@@ -675,7 +675,7 @@ class BaseCacheTests:
         finally:
             cull_cache._max_entries = old_max_entries
 
-    def _perform_invalid_key_test(self, key, expected_warning):
+    def _perform_invalid_key_test(self, key, expected_warning, key_func=None):
         """
         All the builtin backends should warn (except memcached that should
         error) on keys that would be refused by memcached. This encourages
@@ -688,7 +688,7 @@ class BaseCacheTests:
             return key
 
         old_func = cache.key_func
-        cache.key_func = func
+        cache.key_func = key_func or func
 
         tests = [
             ('add', [key, 1]),
@@ -700,7 +700,7 @@ class BaseCacheTests:
             ('delete', [key]),
             ('get_many', [[key, 'b']]),
             ('set_many', [{key: 1, 'b': 2}]),
-            ('delete_many', [{key: 1, 'b': 2}]),
+            ('delete_many', [[key, 'b']]),
         ]
         try:
             for operation, args in tests:
@@ -724,6 +724,19 @@ class BaseCacheTests:
             '%r (longer than %s)' % (key, 250)
         )
         self._perform_invalid_key_test(key, expected_warning)
+
+    def test_invalid_with_version_key_length(self):
+        # Custom make_key() that adds a version to the key and exceeds the
+        # limit.
+        def key_func(key, *args):
+            return key + ':1'
+
+        key = 'a' * 249
+        expected_warning = (
+            'Cache key will cause errors if used with memcached: '
+            '%r (longer than %s)' % (key_func(key), 250)
+        )
+        self._perform_invalid_key_test(key, expected_warning, key_func=key_func)
 
     def test_cache_versioning_get_set(self):
         # set, using default version = 1
@@ -1409,13 +1422,22 @@ class BaseMemcachedTests(BaseCacheTests):
             ('delete', [key]),
             ('get_many', [[key, 'b']]),
             ('set_many', [{key: 1, 'b': 2}]),
-            ('delete_many', [{key: 1, 'b': 2}]),
+            ('delete_many', [[key, 'b']]),
         ]
         for operation, args in tests:
             with self.subTest(operation=operation):
                 with self.assertRaises(InvalidCacheKey) as cm:
                     getattr(cache, operation)(*args)
                 self.assertEqual(str(cm.exception), msg)
+
+    def test_invalid_with_version_key_length(self):
+        # make_key() adds a version to the key and exceeds the limit.
+        key = 'a' * 248
+        expected_warning = (
+            'Cache key will cause errors if used with memcached: '
+            '%r (longer than %s)' % (key, 250)
+        )
+        self._perform_invalid_key_test(key, expected_warning)
 
     def test_default_never_expiring_timeout(self):
         # Regression test for #22845
