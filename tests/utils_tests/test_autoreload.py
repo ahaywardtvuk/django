@@ -213,6 +213,17 @@ class TestChildArguments(SimpleTestCase):
         with self.assertRaisesMessage(RuntimeError, msg):
             autoreload.get_child_arguments()
 
+    @mock.patch('sys.argv', [__file__, 'runserver'])
+    @mock.patch('sys.warnoptions', [])
+    def test_module_no_spec(self):
+        module = types.ModuleType('test_module')
+        del module.__spec__
+        with mock.patch.dict(sys.modules, {'__main__': module}):
+            self.assertEqual(
+                autoreload.get_child_arguments(),
+                [sys.executable, __file__, 'runserver']
+            )
+
 
 class TestUtilities(SimpleTestCase):
     def test_is_django_module(self):
@@ -358,7 +369,7 @@ class StartDjangoTests(SimpleTestCase):
             mocked_thread.call_args[1],
             {'target': fake_main_func, 'args': (123,), 'kwargs': {'abc': 123}, 'name': 'django-main-thread'}
         )
-        self.assertSequenceEqual(fake_thread.setDaemon.call_args[0], [True])
+        self.assertIs(fake_thread.daemon, True)
         self.assertTrue(fake_thread.start.called)
 
 
