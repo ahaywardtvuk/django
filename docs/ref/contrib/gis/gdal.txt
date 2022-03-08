@@ -92,10 +92,6 @@ each feature in that layer.
 
     Returns the name of the data source.
 
-    .. versionchanged:: 3.2
-
-        Support for :class:`pathlib.Path` ``ds_input`` was added.
-
 __ https://gdal.org/drivers/vector/
 
 ``Layer``
@@ -1409,10 +1405,6 @@ blue.
             >>> target.origin
             [-82.98492744885776, 27.601924753080144]
 
-        .. versionchanged:: 3.2
-
-            Support for :class:`SpatialReference` ``srs`` was added
-
     .. attribute:: info
 
         Returns a string with a summary of the raster. This is equivalent to
@@ -1529,8 +1521,7 @@ blue.
         to mark pixels that are not valid data. Such pixels should generally not
         be displayed, nor contribute to analysis operations.
 
-        To delete an existing "no data" value, set this property to ``None``
-        (requires GDAL ≥ 2.1).
+        To delete an existing "no data" value, set this property to ``None``.
 
     .. method:: datatype(as_string=False)
 

@@ -17,7 +17,7 @@ implements the OpenGIS `Simple Features for SQL`__ spatial predicate functions
 and spatial operators. GEOS, now an OSGeo project, was initially developed and
 maintained by `Refractions Research`__ of Victoria, Canada.
 
-__ https://trac.osgeo.org/geos/
+__ https://libgeos.org/
 __ https://sourceforge.net/projects/jts-topo-suite/
 __ https://www.ogc.org/standards/sfs
 __ http://www.refractions.net/
@@ -655,6 +655,16 @@ Other Properties & Methods
         doesn't impose any constraints on the geometry's SRID if called with a
         :class:`~django.contrib.gis.gdal.CoordTransform` object.
 
+.. method:: GEOSGeometry.make_valid()
+
+    .. versionadded:: 4.1
+
+    Returns a valid :class:`GEOSGeometry` equivalent, trying not to lose any of
+    the input vertices. If the geometry is already valid, it is returned
+    untouched. This is similar to the
+    :class:`~django.contrib.gis.db.models.functions.MakeValid` database
+    function. Requires GEOS 3.8.
+
 .. method:: GEOSGeometry.normalize()
 
     Converts this geometry to canonical form::
@@ -766,6 +776,8 @@ Other Properties & Methods
         >>> if poly_1.area > poly_2.area:
         >>>     pass
 
+.. _geos-geometry-collections:
+
 Geometry Collections
 ====================
 
@@ -801,7 +813,7 @@ Geometry Collections
 
     .. attribute:: closed
 
-        Returns ``True`` if and only if all elements are closed. Requires GEOS 3.5.
+        Returns ``True`` if and only if all elements are closed.
 
 ``MultiPolygon``
 ----------------

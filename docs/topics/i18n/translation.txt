@@ -31,12 +31,6 @@ make some optimizations so as not to load the internationalization machinery.
 
 .. note::
 
-    There is also an independent but related :setting:`USE_L10N` setting that
-    controls if Django should implement format localization. See
-    :doc:`/topics/i18n/formatting` for more details.
-
-.. note::
-
     Make sure you've activated translation for your project (the fastest way is
     to check if :setting:`MIDDLEWARE` includes
     :mod:`django.middleware.locale.LocaleMiddleware`). If you haven't yet,
@@ -521,7 +515,7 @@ And then later::
 Localized names of languages
 ----------------------------
 
-.. function:: get_language_info
+.. function:: get_language_info(lang_code)
 
 The ``get_language_info()`` function provides detailed information about
 languages::
@@ -1253,7 +1247,7 @@ URL::
     # The value returned by get_version() must change when translations change.
     urlpatterns = [
         path('jsi18n/',
-             cache_page(86400, key_prefix='js18n-%s' % get_version())(JavaScriptCatalog.as_view()),
+             cache_page(86400, key_prefix='jsi18n-%s' % get_version())(JavaScriptCatalog.as_view()),
              name='javascript-catalog'),
     ]
 
